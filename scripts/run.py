@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import random
+from pathlib import Path
 from rdkit import Chem
 from rdkit.Chem import Descriptors
 from IPython.display import display
@@ -12,7 +13,7 @@ from derive_chemistry import derive_chemistry
 
 
 
-df = pd.read_csv ("projects/data/raw_data/mtbs_tropical_annotations.tsv", sep = '\t')
+df = pd.read_csv ("data/raw_data/mtbs_tropical_annotations.tsv", sep = '\t')
 
 #compounds, rename some of the cols
 compounds = df.rename(columns={'structure_smiles':'smiles', "structure_taxonomy_npclassifier_01pathway":"class","structure_taxonomy_npclassifier_03class": "my_class"}).groupby('smiles',                    
@@ -28,5 +29,9 @@ for s in samples:
 mtbs = {"compounds":compounds, "presAbs":presAbs}
 
 results = derive_chemistry(mtbs)
-for df in results.values():
-      print(df) #worked
+
+output_dir = Path("data/processed")
+output_dir.mkdir(parents=True, exist_ok=True)
+
+for name, result_df in results.items():
+    result_df.to_csv(output_dir / f"{name}.csv")
