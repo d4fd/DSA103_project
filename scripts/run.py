@@ -4,7 +4,6 @@ import random
 from pathlib import Path
 from rdkit import Chem
 from rdkit.Chem import Descriptors
-from IPython.display import display
 
 
 #import custom functions
@@ -35,3 +34,4 @@ output_dir.mkdir(parents=True, exist_ok=True)
 
 for name, result_df in results.items():
     result_df.to_csv(output_dir / f"{name}.csv")
+print("done, results in data/processed")

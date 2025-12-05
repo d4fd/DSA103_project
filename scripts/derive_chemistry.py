@@ -54,8 +54,8 @@ def derive_chemistry(mtbs):# Am schluss folgenden code noch einpacken in functio
     smilesOnly = compReady.set_index("SID")["smiles"].to_dict()
     smilesParsed = {sid: Chem.MolFromSmiles(sm) for sid, sm in smilesOnly.items()}
 
-    #redundant = [2, 7, 8, 11, 15, 17, 18, 20, 21, 24, 29] + list(range(33, 39)) + [41] + list(range(43, 46))
-    redundant = [] #since the Descriptors list from R and Python do not line up one cannot use the exact same ones
+    #redundant = [2, 7, 8, 11, 15, 17, 18, 20, 21, 24, 29] + list(range(33, 39)) + [41] + list(range(43, 46)) #careful, the Descriptors list from R and Python do not line up
+    redundant = []
     all_desc = [d[0] for d in Descriptors.descList]
     descriptors = [d for i, d in enumerate(all_desc) if i not in redundant]
 
@@ -72,14 +72,14 @@ def derive_chemistry(mtbs):# Am schluss folgenden code noch einpacken in functio
         compReady
         .merge(rawChem_df, on = "SID", how="left")
     )
-    compOut = compOut[["SID"] + list(compOut.loc[:, "smiles":"my_class"].columns) + list(compOut.loc[:, :].columns)] #cannot do Fsp3:nAcid because they arent the same in python
+    compOut = compOut[["SID"] + list(compOut.loc[:, "smiles":"my_class"].columns) + list(compOut.loc[:, "MaxAbsEStateIndex":"fr_urea"+1].columns)] #cannot do Fsp3:nAcid because they arent the same in python
     compOut.index = compOut["SID"]
     
     ## Populate chemistry across presence-absence matrix ----
 
     chemSpecies = pd.DataFrame({
         col: populate_chemistry(mtbsReady, compOut[col])
-        for col in compOut.loc[:, :].columns #cannot do Fsp3:nAcid because they arent the same in python as in r
+        for col in compOut.loc[:, "MaxAbsEStateIndex":"fr_urea"+1].columns #cannot do Fsp3:nAcid because they arent the same in python as in r
     })
 
     #delete species where all absent (shouldnt exist)
